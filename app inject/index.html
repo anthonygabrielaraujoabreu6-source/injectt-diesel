@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="theme-color" content="#111111"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-title" content="Inject Diesel"/>
+<title>Inject Diesel PRO</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<link rel="manifest" href="manifest.json"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Inject Diesel PRO"/>
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27><rect width=%27100%27 height=%27100%27 rx=%2720%27 fill=%27%23111%27/><circle cx=%2750%27 cy=%2750%27 r=%2732%27 fill=%27none%27 stroke=%27%2322c55e%27 stroke-width=%276%27/><text x=%2750%27 y=%2762%27 text-anchor=%27middle%27 font-size=%2742%27 font-weight=%27900%27 fill=%27%2322c55e%27 font-family=%27Arial%27>I</text></svg>"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --g:#22c55e;--gd:#15803d;--bg:#0d0d0d;--s1:#111;--s2:#1a1a1a;--s3:#222;
+  --b1:#2d2d2d;--t1:#f0f0f0;--t2:#aaa;--t3:#555;--red:#ef4444;--yellow:#f59e0b;--blue:#3b82f6;
+}
+html,body{height:100%;font-family:"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--t1);font-size:14px;overflow:hidden;}
+button{font-family:inherit;cursor:pointer;}
+input,select,textarea{font-family:inherit;}
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--s3);border-radius:3px;}
+
+/* ── LAYOUT ── */
+#app{display:grid;grid-template-columns:220px 1fr;height:100vh;}
+
+/* ── SIDEBAR ── */
+#sidebar{background:var(--s1);border-right:1px solid var(--s3);display:flex;flex-direction:column;overflow:hidden;}
+.sb-logo{padding:14px 12px;border-bottom:1px solid var(--s3);display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.sb-ring{width:32px;height:32px;border:2px solid var(--g);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:var(--g);flex-shrink:0;}
+.sb-brand{font-size:14px;font-weight:900;color:var(--g);}
+.sb-sub{font-size:9px;color:var(--t3);}
+.sb-nav{flex-shrink:0;}
+.sb-item{display:flex;align-items:center;gap:9px;padding:10px 14px;font-size:13px;color:var(--t2);cursor:pointer;border-left:3px solid transparent;transition:all .1s;}
+.sb-item svg{width:16px;height:16px;flex-shrink:0;}
+.sb-item:hover{color:var(--t1);background:rgba(255,255,255,.04);}
+.sb-item.active{color:var(--g);background:rgba(34,197,94,.08);border-left-color:var(--g);font-weight:600;}
+.sb-sep{height:1px;background:var(--s3);margin:6px 0;}
+.sb-version{padding:10px 14px;font-size:10px;color:var(--t3);margin-top:auto;flex-shrink:0;}
+
+/* ── MAIN ── */
+#main{display:flex;flex-direction:column;overflow:hidden;background:var(--bg);}
+.view{display:none;flex:1;overflow:auto;flex-direction:column;}
+.view.show{display:flex;}
+
+/* ── TOPBAR ── */
+.topbar{background:var(--s1);border-bottom:1px solid var(--s3);padding:10px 18px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.topbar-left{display:flex;align-items:center;gap:12px;}
+.topbar-title{font-size:16px;font-weight:700;}
+.topbar-sub{font-size:11px;color:var(--t3);}
+.topbar-right{display:flex;gap:6px;align-items:center;}
+.btn{display:flex;align-items:center;gap:5px;padding:7px 13px;border-radius:6px;font-size:12px;font-weight:700;border:none;transition:opacity .15s;white-space:nowrap;}
+.btn:hover{opacity:.85;}
+.btn svg{width:14px;height:14px;flex-shrink:0;}
+.btn-ghost{background:var(--s2);color:var(--t2);border:1px solid var(--b1);}
+.btn-ghost:hover{color:var(--t1);}
+.btn-green{background:var(--gd);color:#fff;}
+.btn-g{background:var(--g);color:#000;}
+.btn-wa{background:#15803d;color:#fff;}
+.btn-mail{background:#b91c1c;color:#fff;}
+.btn-red{background:transparent;color:var(--red);border:1px solid var(--red);}
+.btn-blue{background:var(--blue);color:#fff;}
+.btn-yellow{background:var(--yellow);color:#000;}
+
+/* ── CARDS ── */
+.page-wrap{padding:20px;flex:1;}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+.metric{background:var(--s2);border:1px solid var(--b1);border-radius:10px;padding:16px;}
+.metric-lbl{font-size:11px;color:var(--t3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px;}
+.metric-val{font-size:22px;font-weight:700;}
+.metric-val.green{color:var(--g);}
+.metric-val.red{color:var(--red);}
+.metric-val.yellow{color:var(--yellow);}
+.metric-sub{font-size:11px;color:var(--t3);margin-top:4px;}
+
+/* ── TABLE ── */
+.tbl-wrap{background:var(--s2);border:1px solid var(--b1);border-radius:10px;overflow:hidden;margin-bottom:16px;}
+.tbl-head{padding:12px 16px;border-bottom:1px solid var(--s3);display:flex;align-items:center;justify-content:space-between;}
+.tbl-title{font-size:13px;font-weight:700;color:var(--t1);}
+table.dt{width:100%;border-collapse:collapse;}
+table.dt th{font-size:10px;color:var(--t3);font-weight:600;padding:10px 14px;text-align:left;border-bottom:1px solid var(--s3);text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;}
+table.dt td{padding:11px 14px;border-bottom:1px solid var(--s3);font-size:13px;color:var(--t1);vertical-align:middle;}
+table.dt tr:last-child td{border-bottom:none;}
+table.dt tr:hover td{background:rgba(255,255,255,.02);}
+table.dt td.muted{color:var(--t3);}
+table.dt td.green{color:var(--g);font-weight:700;}
+table.dt td.red{color:var(--red);font-weight:700;}
+table.dt td.yellow{color:var(--yellow);}
+.clickable{cursor:pointer;}
+
+/* ── BADGE ── */
+.badge{display:inline-block;font-size:10px;font-weight:700;padding:3px 8px;border-radius:10px;white-space:nowrap;}
+.badge-open{background:rgba(245,158,11,.15);color:#f59e0b;}
+.badge-aprov{background:rgba(59,130,246,.15);color:#60a5fa;}
+.badge-exec{background:rgba(168,85,247,.15);color:#c084fc;}
+.badge-conc{background:rgba(34,197,94,.15);color:#4ade80;}
+.badge-pago{background:rgba(34,197,94,.25);color:#22c55e;}
+.badge-red{background:rgba(239,68,68,.15);color:#f87171;}
+.badge-blue{background:rgba(59,130,246,.15);color:#60a5fa;}
+
+/* ── FORM ── */
+.form-grid{display:grid;gap:12px;}
+.form-row{display:grid;gap:12px;}
+.field{display:flex;flex-direction:column;gap:5px;}
+.field label{font-size:11px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.4px;}
+.field input,.field select,.field textarea{background:var(--s2);border:1px solid var(--b1);border-radius:6px;padding:8px 12px;font-size:13px;color:var(--t1);outline:none;transition:border-color .15s;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--g);}
+.field input::placeholder,.field textarea::placeholder{color:var(--t3);}
+.field textarea{resize:vertical;min-height:70px;}
+.field select option{background:var(--s2);}
+
+/* ── MODAL ── */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:999;align-items:center;justify-content:center;padding:20px;}
+.modal-bg.show{display:flex;}
+.modal{background:var(--s1);border:1px solid var(--s3);border-radius:12px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;display:flex;flex-direction:column;}
+.modal-head{padding:18px 20px;border-bottom:1px solid var(--s3);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.modal-title{font-size:15px;font-weight:700;}
+.modal-close{background:none;border:none;color:var(--t3);font-size:20px;padding:0 4px;cursor:pointer;}
+.modal-close:hover{color:var(--t1);}
+.modal-body{padding:20px;flex:1;}
+.modal-foot{padding:14px 20px;border-top:1px solid var(--s3);display:flex;justify-content:flex-end;gap:8px;flex-shrink:0;}
+
+/* ── LOADING MODAL ── */
+.spin-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center;}
+.spin-bg.show{display:flex;}
+.spin-box{background:var(--s1);border:1px solid var(--s3);border-radius:12px;padding:28px 36px;text-align:center;}
+.spin{width:36px;height:36px;border:3px solid var(--s3);border-top-color:var(--g);border-radius:50%;animation:sp .8s linear infinite;margin:0 auto 12px;}
+@keyframes sp{to{transform:rotate(360deg);}}
+.spin-box p{font-size:14px;color:var(--t2);}
+
+/* ── ORC DOCUMENT ── */
+.orc-wrap{padding:16px;}
+#doc{background:#fff;color:#111;border-radius:8px;overflow:hidden;}
+.cab{display:grid;grid-template-columns:155px 1fr;border-bottom:2px solid #111;}
+.logo-box{background:#000;display:flex;align-items:center;justify-content:center;padding:14px 8px;border-right:2px solid #111;}
+.logo-inner{text-align:center;line-height:1;}
+.logo-anel{width:42px;height:42px;border:3px solid #22c55e;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 4px;font-size:23px;font-weight:900;color:#22c55e;}
+.logo-inject{font-size:26px;font-weight:900;color:#22c55e;letter-spacing:-1px;}
+.logo-diesel{font-size:13px;font-weight:900;color:#22c55e;letter-spacing:5px;margin-top:1px;}
+.logo-slogan{font-size:7px;color:#22c55e;margin-top:3px;line-height:1.5;opacity:.85;}
+.emp-col{display:flex;flex-direction:column;}
+.emp-linha{display:grid;border-bottom:1px solid #ccc;min-height:27px;}
+.emp-linha:last-child{border-bottom:none;}
+.emp-lbl{background:#111;color:#22c55e;font-size:9px;font-weight:700;padding:0 8px;border-right:1px solid #333;display:flex;align-items:center;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;}
+.emp-val{font-size:11px;font-weight:600;padding:0 10px;display:flex;align-items:center;color:#111;}
+.orc-titulo{background:#111;display:flex;align-items:center;justify-content:space-between;padding:6px 14px;border-bottom:2px solid #111;}
+.orc-titulo h2{font-size:13px;font-weight:900;color:#22c55e;letter-spacing:5px;text-transform:uppercase;}
+.orc-badge{background:#1a3d2b;color:#22c55e;font-size:12px;font-weight:700;padding:3px 12px;border-radius:20px;}
+.cli-sec{border-bottom:2px solid #111;}
+.cli-row{display:grid;border-bottom:1px solid #ddd;}
+.cli-row:last-child{border-bottom:none;}
+.cli-cell{display:flex;align-items:center;gap:5px;padding:5px 9px;border-right:1px solid #ddd;overflow:hidden;}
+.cli-cell:last-child{border-right:none;}
+.cli-lbl{font-size:9px;font-weight:800;color:#15803d;text-transform:uppercase;letter-spacing:.3px;white-space:nowrap;flex-shrink:0;}
+.cli-cell input{border:none;background:transparent;font-size:12px;font-weight:600;color:#111;flex:1;min-width:0;outline:none;font-family:inherit;height:21px;line-height:21px;}
+.cli-cell input::placeholder{color:#bbb;font-weight:400;}
+.sec-head{background:#111;color:#22c55e;font-size:10px;font-weight:800;letter-spacing:3px;text-transform:uppercase;padding:6px 12px;}
+table.t{width:100%;border-collapse:collapse;font-size:12px;}
+table.t th{background:#1c1c1c;color:#22c55e;font-size:9px;font-weight:700;padding:6px 6px;text-align:center;border:1px solid #333;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;}
+table.t th.L{text-align:left;padding-left:9px;}
+table.t td{padding:4px 5px;border:1px solid #e0e0e0;text-align:center;color:#111;vertical-align:middle;}
+table.t tr:nth-child(even) td{background:#f8fafb;}
+table.t td.n{color:#aaa;font-size:10px;width:26px;}
+table.t td.sub{font-weight:700;color:#15803d;white-space:nowrap;}
+table.t td input{border:none;background:transparent;font-size:12px;font-weight:600;color:#111;width:100%;outline:none;text-align:center;font-family:inherit;height:22px;line-height:22px;display:block;}
+table.t td input.L{text-align:left;padding-left:3px;}
+table.t td input::placeholder{color:#ccc;font-weight:400;font-size:10px;}
+table.t td input.red-in{color:#dc2626;}
+table.t td input:focus{background:#f0fdf4;border-radius:3px;}
+.btn-del-row{background:none;border:none;cursor:pointer;color:#ccc;font-size:13px;padding:3px 6px;border-radius:4px;}
+.btn-del-row:hover{color:#dc2626;background:#fee2e2;}
+.btn-add-row{width:100%;background:#f0fdf4;color:#15803d;border:none;border-top:1px dashed #c8e6c9;font-size:11px;font-weight:700;padding:8px;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:5px;}
+.btn-add-row:hover{background:#dcfce7;}
+.totais{border-top:2px solid #111;}
+.t-row{display:flex;justify-content:space-between;align-items:center;padding:7px 14px;border-bottom:1px solid #eee;font-size:12px;}
+.t-row:last-child{border-bottom:none;}
+.t-lbl{color:#555;font-weight:500;}
+.t-val{font-weight:800;color:#15803d;font-size:13px;white-space:nowrap;}
+.t-val.red{color:#dc2626;}
+.desc-row{display:flex;align-items:center;gap:10px;padding:7px 14px;border-bottom:1px solid #eee;font-size:12px;}
+.desc-lbl{color:#555;font-weight:500;flex:1;}
+.desc-input{border:1px solid #ccc;background:#f9fafb;color:#111;border-radius:5px;padding:3px 8px;font-size:12px;width:65px;text-align:center;outline:none;font-family:inherit;font-weight:700;}
+.desc-input:focus{border-color:#16a34a;}
+.final-row{background:#111;display:flex;justify-content:space-between;align-items:center;padding:11px 14px;}
+.f-lbl{font-size:14px;font-weight:900;color:#22c55e;letter-spacing:2px;}
+.f-val{font-size:20px;font-weight:900;color:#fff;}
+.assin{display:grid;grid-template-columns:1fr 1fr;border-top:2px solid #111;}
+.assin-cell{padding:28px 18px 10px;text-align:center;font-size:10px;color:#888;border-right:1px solid #ddd;}
+.assin-cell:last-child{border-right:none;}
+.assin-line{border-top:1px solid #aaa;margin-bottom:5px;}
+
+/* ESTOQUE */
+.estoque-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;}
+.peca-card{background:var(--s2);border:1px solid var(--b1);border-radius:10px;padding:14px;position:relative;}
+.peca-card.low{border-color:var(--red);}
+.peca-name{font-size:14px;font-weight:700;margin-bottom:4px;}
+.peca-info{font-size:12px;color:var(--t3);margin-bottom:10px;}
+.peca-stock{display:flex;justify-content:space-between;align-items:center;}
+.peca-qty{font-size:20px;font-weight:700;}
+.peca-qty.low{color:var(--red);}
+.peca-qty.ok{color:var(--g);}
+.peca-min{font-size:11px;color:var(--t3);}
+.peca-actions{display:flex;gap:6px;margin-top:10px;}
+.peca-btn{flex:1;padding:5px;border-radius:5px;font-size:12px;font-weight:700;border:none;cursor:pointer;font-family:inherit;}
+.peca-btn-add{background:rgba(34,197,94,.15);color:var(--g);}
+.peca-btn-add:hover{background:rgba(34,197,94,.25);}
+.peca-btn-edit{background:var(--s3);color:var(--t2);}
+.peca-btn-edit:hover{background:var(--b1);color:var(--t1);}
+
+/* CHART */
+.chart-wrap{background:var(--s2);border:1px solid var(--b1);border-radius:10px;padding:16px;margin-bottom:16px;}
+.chart-title{font-size:13px;font-weight:700;margin-bottom:14px;}
+.bar-chart{display:flex;align-items:flex-end;gap:8px;height:120px;}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;}
+.bar-val{font-size:9px;color:var(--t3);text-align:center;}
+.bar{width:100%;background:var(--g);border-radius:4px 4px 0 0;min-height:4px;transition:height .3s;}
+.bar-lbl{font-size:9px;color:var(--t3);text-align:center;white-space:nowrap;}
+
+/* CONFIG */
+.config-section{background:var(--s2);border:1px solid var(--b1);border-radius:10px;margin-bottom:16px;overflow:hidden;}
+.config-head{padding:14px 18px;border-bottom:1px solid var(--s3);font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px;}
+.config-head svg{width:16px;height:16px;color:var(--g);}
+.config-body{padding:18px;}
+.logo-upload{width:100%;height:100px;border:2px dashed var(--b1);border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .15s;flex-direction:column;gap:6px;color:var(--t3);}
+.logo-upload:hover{border-color:var(--g);color:var(--g);}
+.logo-upload img{max-height:80px;max-width:200px;object-fit:contain;}
+.color-grid{display:flex;gap:8px;flex-wrap:wrap;}
+.color-opt{width:32px;height:32px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:border-color .15s;}
+.color-opt.sel{border-color:#fff;}
+
+/* PRINT */
+@media print{
+  @page{size:A4 portrait;margin:10mm;}
+  html,body{background:#fff!important;overflow:visible!important;}
+  #app{display:block!important;}
+  #sidebar,.topbar,.no-print{display:none!important;}
+  .orc-wrap{padding:0!important;}
+  #doc{border-radius:0!important;}
+  .btn-add-row,.btn-del-row{display:none!important;}
+  .view.show{overflow:visible!important;display:block!important;}
+  table.t td input{height:auto!important;line-height:normal!important;}
+  .cli-cell input{height:auto!important;line-height:normal!important;}
+}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--s1);border:1px solid var(--g);border-radius:8px;padding:12px 18px;font-size:13px;color:var(--t1);z-index:2000;transform:translateY(100px);opacity:0;transition:all .3s;}
+.toast.show{transform:translateY(0);opacity:1;}
+
+/* EMPTY */
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:10px;color:var(--t3);padding:40px;}
+.empty-state svg{width:48px;height:48px;opacity:.3;}
+</style>
+</head>
+<body>
+<div class="spin-bg" id="spin-bg">
+  <div class="spin-box"><div class="spin"></div><p id="spin-txt">Aguarde...</p></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<div id="app">
+<!-- SIDEBAR -->
+<div id="sidebar">
+  <div class="sb-logo">
+    <div class="sb-ring" id="sb-ring-letter">I</div>
+    <div><div class="sb-brand" id="sb-brand-name">INJECT DIESEL</div><div class="sb-sub">Sistema PRO</div></div>
+  </div>
+  <div class="sb-nav">
+    <div class="sb-item active" onclick="nav('orc')" id="nav-orc">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10,9 9,9 8,9"/></svg>
+      Orçamentos
+    </div>
+    <div class="sb-item" onclick="nav('dash')" id="nav-dash">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Dashboard
+    </div>
+    <div class="sb-sep"></div>
+    <div class="sb-item" onclick="nav('fin')" id="nav-fin">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      Financeiro
+    </div>
+    <div class="sb-item" onclick="nav('estoque')" id="nav-estoque">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+      Estoque
+    </div>
+    <div class="sb-item" onclick="nav('relat')" id="nav-relat">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Relatórios
+    </div>
+    <div class="sb-sep"></div>
+    <div class="sb-item" onclick="nav('config')" id="nav-config">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      Configurações
+    </div>
+  </div>
+  <button id="btn-install" onclick="installApp()" style="display:none;margin:8px 12px;background:var(--g);color:#000;border:none;border-radius:7px;padding:9px 12px;font-size:12px;font-weight:800;cursor:pointer;align-items:center;justify-content:center;gap:6px;font-family:inherit;" class="no-print">📲 Instalar App</button><div class="sb-version">Inject Diesel PRO v2.0</div>
+</div>
+
+<!-- MAIN -->
+<div id="main">
+
+<!-- ── VIEW: ORÇAMENTO ── -->
+<div class="view show" id="view-orc">
+  <div class="topbar no-print">
+    <div class="topbar-left">
+      <div>
+        <div class="topbar-title" id="tb-title">Novo Orçamento</div>
+        <div class="topbar-sub" id="tb-sub">Preencha e salve</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <select class="desc-input" id="status-sel" onchange="saveOrc()" style="width:140px;font-size:12px;color:var(--t1);background:var(--s2);">
+        <option value="aberta">🟡 Aberta</option>
+        <option value="aprovado">🔵 Aprovado</option>
+        <option value="execucao">🟣 Em execução</option>
+        <option value="concluido">🟢 Concluído</option>
+        <option value="pago">✅ Pago</option>
+      </select>
+      <button class="btn btn-ghost no-print" onclick="novoOrc()">+ Novo</button>
+      <button class="btn btn-green no-print" onclick="saveOrc()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17,21 17,13 7,13"/><polyline points="7,3 7,8 15,8"/></svg>
+        Salvar
+      </button>
+      <button class="btn btn-wa no-print" onclick="enviarWa()">📲 WhatsApp</button>
+      <button class="btn btn-mail no-print" onclick="enviarMail()">📧 Gmail</button>
+      <button class="btn btn-g no-print" onclick="window.print()">🖨️ PDF</button>
+      <button class="btn btn-red no-print" id="btn-del-orc" style="display:none;" onclick="deletarOrc()">🗑️</button>
+    </div>
+  </div>
+
+  <!-- LISTA DE ORC (sidebar direita do orc) -->
+  <div style="display:flex;flex:1;overflow:hidden;">
+    <div style="width:200px;background:var(--s1);border-right:1px solid var(--s3);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;" class="no-print">
+      <div style="padding:8px 10px;border-bottom:1px solid var(--s3);">
+        <input id="orc-search" type="text" placeholder="🔍 Buscar…" oninput="renderOrcList()" style="width:100%;background:var(--s2);border:1px solid var(--b1);border-radius:5px;padding:5px 8px;font-size:12px;color:var(--t1);outline:none;"/>
+      </div>
+      <div style="flex:1;overflow-y:auto;" id="orc-list"></div>
+    </div>
+    <div style="flex:1;overflow-y:auto;">
+      <div class="orc-wrap">
+      <div id="doc">
+        <div class="cab">
+          <div class="logo-box">
+            <div class="logo-inner" id="doc-logo-area">
+              <div class="logo-anel" id="doc-logo-letter">I</div>
+              <div class="logo-inject" id="doc-logo-name">INJECT</div>
+              <div class="logo-diesel" id="doc-logo-sub">DIESEL</div>
+              <div class="logo-slogan" id="doc-logo-slogan">BOMBAS INJETORAS E<br>INJEÇÃO ELETRÔNICA</div>
+            </div>
+          </div>
+          <div class="emp-col">
+            <div class="emp-linha" style="grid-template-columns:100px 1fr;"><div class="emp-lbl">Razão Social</div><div class="emp-val" id="doc-razao">INJECT DIESEL</div></div>
+            <div class="emp-linha" style="grid-template-columns:100px 1fr;"><div class="emp-lbl">CNPJ</div><div class="emp-val" id="doc-cnpj">14.115.613/0001-89</div></div>
+            <div class="emp-linha" style="grid-template-columns:100px 1fr;"><div class="emp-lbl">Endereço</div><div class="emp-val" id="doc-end">BR N1015</div></div>
+            <div class="emp-linha" style="grid-template-columns:100px 1fr 75px 1fr;">
+              <div class="emp-lbl">Telefone</div><div class="emp-val" id="doc-tel">(98) 98501-9532</div>
+              <div class="emp-lbl" style="border-left:1px solid #333;">Contato</div><div class="emp-val" id="doc-tel2">(98) 99155-0075</div>
+            </div>
+            <div class="emp-linha" style="grid-template-columns:100px 1fr;"><div class="emp-lbl">Especialidade</div><div class="emp-val" id="doc-esp">Bombas Injetoras e Injeção Eletrônica</div></div>
+          </div>
+        </div>
+        <div class="orc-titulo">
+          <h2>Orçamento</h2>
+          <div class="orc-badge">Nº <span id="orc-num">001</span></div>
+        </div>
+        <div class="cli-sec">
+          <div class="cli-row" style="grid-template-columns:2fr 1fr 1fr;">
+            <div class="cli-cell"><span class="cli-lbl">Cliente:</span><input id="f-nome" type="text" placeholder="Nome completo" oninput="updateTb()"/></div>
+            <div class="cli-cell"><span class="cli-lbl">Entrada:</span><input id="f-entrada" type="date"/></div>
+            <div class="cli-cell"><span class="cli-lbl">Garantia até:</span><input id="f-garantia" type="date"/></div>
+          </div>
+          <div class="cli-row" style="grid-template-columns:1fr 1fr 1fr 1fr;">
+            <div class="cli-cell"><span class="cli-lbl">Telefone:</span><input id="f-tel" type="text" placeholder="(98) 99999-9999"/></div>
+            <div class="cli-cell"><span class="cli-lbl">Modelo:</span><input id="f-modelo" type="text" placeholder="Ex: Sprinter 415"/></div>
+            <div class="cli-cell"><span class="cli-lbl">Placa:</span><input id="f-placa" type="text" placeholder="ABC-1234"/></div>
+            <div class="cli-cell"><span class="cli-lbl">KM:</span><input id="f-km" type="text" placeholder="120.000"/></div>
+          </div>
+          <div class="cli-row" style="grid-template-columns:2fr 1fr;">
+            <div class="cli-cell"><span class="cli-lbl">Defeito:</span><input id="f-defeito" type="text" placeholder="Descreva o problema…"/></div>
+            <div class="cli-cell"><span class="cli-lbl">Mecânico:</span><input id="f-mecanico" type="text" placeholder="Nome do responsável"/></div>
+          </div>
+        </div>
+        <div class="sec-head">Peças Utilizadas</div>
+        <table class="t">
+          <thead><tr>
+            <th style="width:26px;">#</th>
+            <th class="L" style="width:42%;">Descrição da Peça</th>
+            <th style="width:46px;">Qtde</th>
+            <th style="width:95px;">Vlr. Unit. (R$)</th>
+            <th style="width:95px;">Desconto (R$)</th>
+            <th style="width:95px;">Subtotal</th>
+            <th class="no-print" style="width:32px;"></th>
+          </tr></thead>
+          <tbody id="tbody-pecas"></tbody>
+        </table>
+        <button class="btn-add-row no-print" onclick="addPeca()">+ Adicionar Peça</button>
+        <div class="sec-head">Mão de Obra</div>
+        <table class="t">
+          <thead><tr>
+            <th style="width:26px;">#</th>
+            <th class="L">Descrição do Serviço</th>
+            <th style="width:130px;">Valor (R$)</th>
+            <th style="width:95px;">Subtotal</th>
+            <th class="no-print" style="width:32px;"></th>
+          </tr></thead>
+          <tbody id="tbody-mo"></tbody>
+        </table>
+        <button class="btn-add-row no-print" onclick="addMO()">+ Adicionar Serviço</button>
+        <div class="totais">
+          <div class="t-row"><span class="t-lbl">Total Peças (bruto)</span><span class="t-val" id="tot-bruto">R$ 0,00</span></div>
+          <div class="t-row"><span class="t-lbl" style="color:#dc2626;">Desconto por peça</span><span class="t-val red" id="tot-desc-item">- R$ 0,00</span></div>
+          <div class="desc-row">
+            <span class="desc-lbl">Desconto geral nas peças</span>
+            <input class="desc-input no-print" type="number" id="f-desc-pct" min="0" max="100" step="0.5" value="0" oninput="calc()"/>
+            <span style="font-size:12px;color:#aaa;" class="no-print">%</span>
+            <span class="t-val red" id="tot-desc-pct">- R$ 0,00</span>
+          </div>
+          <div class="t-row"><span class="t-lbl" style="font-weight:700;">Total Peças (com descontos)</span><span class="t-val" id="tot-liq">R$ 0,00</span></div>
+          <div class="t-row"><span class="t-lbl">Total Mão de Obra</span><span class="t-val" id="tot-mo">R$ 0,00</span></div>
+          <div class="final-row"><span class="f-lbl">TOTAL GERAL</span><span class="f-val" id="tot-geral">R$ 0,00</span></div>
+        </div>
+        <div class="assin">
+          <div class="assin-cell"><div class="assin-line"></div>Assinatura do Cliente</div>
+          <div class="assin-cell"><div class="assin-line"></div>Assinatura do Responsável</div>
+        </div>
+      </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── VIEW: DASHBOARD ── -->
+<div class="view" id="view-dash">
+  <div class="topbar"><div class="topbar-title">Dashboard</div><div class="topbar-sub" id="dash-date"></div></div>
+  <div class="page-wrap" id="dash-content"></div>
+</div>
+
+<!-- ── VIEW: FINANCEIRO ── -->
+<div class="view" id="view-fin">
+  <div class="topbar">
+    <div class="topbar-title">Financeiro</div>
+    <div class="topbar-right">
+      <button class="btn btn-green" onclick="openModalPag()">+ Registrar Pagamento</button>
+    </div>
+  </div>
+  <div class="page-wrap" id="fin-content"></div>
+</div>
+
+<!-- ── VIEW: ESTOQUE ── -->
+<div class="view" id="view-estoque">
+  <div class="topbar">
+    <div class="topbar-title">Estoque de Peças</div>
+    <div class="topbar-right">
+      <button class="btn btn-green" onclick="openModalPeca()">+ Nova Peça</button>
+    </div>
+  </div>
+  <div class="page-wrap" id="estoque-content"></div>
+</div>
+
+<!-- ── VIEW: RELATÓRIOS ── -->
+<div class="view" id="view-relat">
+  <div class="topbar"><div class="topbar-title">Relatórios</div></div>
+  <div class="page-wrap" id="relat-content"></div>
+</div>
+
+<!-- ── VIEW: CONFIGURAÇÕES ── -->
+<div class="view" id="view-config">
+  <div class="topbar">
+    <div class="topbar-title">Configurações</div>
+    <div class="topbar-right"><button class="btn btn-green" onclick="saveConfig()">💾 Salvar</button></div>
+  </div>
+  <div class="page-wrap">
+    <div style="max-width:600px;">
+      <div class="config-section">
+        <div class="config-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg> Logo da Empresa</div>
+        <div class="config-body">
+          <div class="logo-upload" id="logo-upload-area" onclick="document.getElementById('logo-file').click()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="28" height="28"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17,8 12,3 7,8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <span style="font-size:12px;">Clique para enviar sua logo</span>
+          </div>
+          <input type="file" id="logo-file" accept="image/*" style="display:none;" onchange="handleLogo(this)"/>
+        </div>
+      </div>
+      <div class="config-section">
+        <div class="config-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg> Dados da Empresa</div>
+        <div class="config-body">
+          <div class="form-grid">
+            <div class="form-row" style="grid-template-columns:1fr 1fr;">
+              <div class="field"><label>Nome da empresa</label><input id="cfg-nome" type="text" placeholder="INJECT DIESEL"/></div>
+              <div class="field"><label>CNPJ</label><input id="cfg-cnpj" type="text" placeholder="00.000.000/0001-00"/></div>
+            </div>
+            <div class="field"><label>Endereço</label><input id="cfg-end" type="text" placeholder="Rua, número, bairro, cidade"/></div>
+            <div class="form-row" style="grid-template-columns:1fr 1fr;">
+              <div class="field"><label>Telefone 1</label><input id="cfg-tel1" type="text" placeholder="(98) 98501-9532"/></div>
+              <div class="field"><label>Telefone 2</label><input id="cfg-tel2" type="text" placeholder="(98) 99155-0075"/></div>
+            </div>
+            <div class="field"><label>Especialidade / Slogan</label><input id="cfg-esp" type="text" placeholder="Bombas Injetoras e Injeção Eletrônica"/></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- #main -->
+</div><!-- #app -->
+
+<!-- MODAL: PAGAMENTO -->
+<div class="modal-bg" id="modal-pag">
+  <div class="modal">
+    <div class="modal-head"><span class="modal-title">Registrar Pagamento</span><button class="modal-close" onclick="closeModal('modal-pag')">×</button></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="field"><label>Orçamento</label>
+          <select id="pag-orc-sel">
+            <option value="">Selecione o orçamento…</option>
+          </select>
+        </div>
+        <div class="form-row" style="grid-template-columns:1fr 1fr;">
+          <div class="field"><label>Valor recebido (R$)</label><input id="pag-val" type="number" step="0.01" min="0" placeholder="0,00"/></div>
+          <div class="field"><label>Data</label><input id="pag-data" type="date"/></div>
+        </div>
+        <div class="field"><label>Forma de pagamento</label>
+          <select id="pag-forma">
+            <option value="pix">Pix</option>
+            <option value="dinheiro">Dinheiro</option>
+            <option value="credito">Cartão de Crédito</option>
+            <option value="debito">Cartão de Débito</option>
+            <option value="boleto">Boleto</option>
+            <option value="parcelado">Parcelado</option>
+          </select>
+        </div>
+        <div class="field"><label>Observação</label><textarea id="pag-obs" placeholder="Opcional…"></textarea></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('modal-pag')">Cancelar</button>
+      <button class="btn btn-green" onclick="salvarPag()">Salvar Pagamento</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: PEÇA ESTOQUE -->
+<div class="modal-bg" id="modal-peca">
+  <div class="modal">
+    <div class="modal-head"><span class="modal-title" id="modal-peca-title">Nova Peça</span><button class="modal-close" onclick="closeModal('modal-peca')">×</button></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="field"><label>Nome da peça</label><input id="peca-nome" type="text" placeholder="Ex: Bomba d'água"/></div>
+        <div class="form-row" style="grid-template-columns:1fr 1fr 1fr;">
+          <div class="field"><label>Qtd em estoque</label><input id="peca-qty" type="number" min="0" step="1" placeholder="0"/></div>
+          <div class="field"><label>Qtd mínima</label><input id="peca-min" type="number" min="0" step="1" placeholder="2"/></div>
+          <div class="field"><label>Preço de custo (R$)</label><input id="peca-custo" type="number" min="0" step="0.01" placeholder="0,00"/></div>
+        </div>
+        <div class="field"><label>Preço de venda (R$)</label><input id="peca-venda" type="number" min="0" step="0.01" placeholder="0,00"/></div>
+        <div class="field"><label>Fornecedor</label><input id="peca-forn" type="text" placeholder="Nome do fornecedor (opcional)"/></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('modal-peca')">Cancelar</button>
+      <button class="btn btn-green" onclick="salvarPeca()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: ENTRADA ESTOQUE -->
+<div class="modal-bg" id="modal-entrada">
+  <div class="modal" style="max-width:360px;">
+    <div class="modal-head"><span class="modal-title">Entrada de Estoque</span><button class="modal-close" onclick="closeModal('modal-entrada')">×</button></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="field"><label>Peça</label><input id="entrada-peca-nome" type="text" readonly style="color:var(--t3);"/></div>
+        <div class="field"><label>Quantidade a adicionar</label><input id="entrada-qty" type="number" min="1" step="1" placeholder="0"/></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('modal-entrada')">Cancelar</button>
+      <button class="btn btn-green" onclick="salvarEntrada()">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+// STORAGE
+// ══════════════════════════════════════════════
+const SK = {
+  orcs:'idpro_orcs', pags:'idpro_pags', pecas:'idpro_pecas', cfg:'idpro_cfg'
+};
+let orcs=[], pags=[], pecas=[], cfg={};
+let currentId=null, rowId=0, pecaCount=0, moCount=0;
+let editingPecaId=null, entradaPecaId=null;
+
+function loadAll(){
+  try{ orcs=JSON.parse(localStorage.getItem(SK.orcs))||[]; }catch(e){ orcs=[]; }
+  try{ pags=JSON.parse(localStorage.getItem(SK.pags))||[]; }catch(e){ pags=[]; }
+  try{ pecas=JSON.parse(localStorage.getItem(SK.pecas))||[]; }catch(e){ pecas=[]; }
+  try{ cfg=JSON.parse(localStorage.getItem(SK.cfg))||{}; }catch(e){ cfg={}; }
+}
+function saveOrcs(){ localStorage.setItem(SK.orcs,JSON.stringify(orcs)); }
+function savePags(){ localStorage.setItem(SK.pags,JSON.stringify(pags)); }
+function savePecas(){ localStorage.setItem(SK.pecas,JSON.stringify(pecas)); }
+function saveCfg(){ localStorage.setItem(SK.cfg,JSON.stringify(cfg)); }
+function genId(){ return Date.now().toString(36)+Math.random().toString(36).slice(2); }
+function nextNum(){ if(!orcs.length)return'001'; return String(Math.max(...orcs.map(o=>parseInt(o.num)||0))+1).padStart(3,'0'); }
+
+// ══════════════════════════════════════════════
+// FORMAT
+// ══════════════════════════════════════════════
+function fmt(v){ return 'R$ '+Number(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function fmtD(d){ if(!d)return'—'; const p=d.split('-'); return p.length===3?p[2]+'/'+p[1]+'/'+p[0]:d; }
+function badgeHtml(s){
+  const m={aberta:['badge-open','🟡 Aberta'],aprovado:['badge-aprov','🔵 Aprovado'],execucao:['badge-exec','🟣 Em execução'],concluido:['badge-conc','🟢 Concluído'],pago:['badge-pago','✅ Pago']};
+  const[c,l]=m[s]||m.aberta; return `<span class="badge ${c}">${l}</span>`;
+}
+function pagForma(f){
+  const m={pix:'Pix',dinheiro:'Dinheiro',credito:'Cartão Crédito',debito:'Cartão Débito',boleto:'Boleto',parcelado:'Parcelado'};
+  return m[f]||f;
+}
+
+// ══════════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════════
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500); }
+
+// ══════════════════════════════════════════════
+// NAV
+// ══════════════════════════════════════════════
+function nav(v){
+  ['orc','dash','fin','estoque','relat','config'].forEach(x=>{
+    document.getElementById('view-'+x).classList.toggle('show',x===v);
+    document.getElementById('nav-'+x)?.classList.toggle('active',x===v);
+  });
+  if(v==='dash') renderDash();
+  if(v==='fin') renderFin();
+  if(v==='estoque') renderEstoque();
+  if(v==='relat') renderRelat();
+  if(v==='config') loadConfigForm();
+}
+
+// ══════════════════════════════════════════════
+// MODAL
+// ══════════════════════════════════════════════
+function openModal(id){ document.getElementById(id).classList.add('show'); }
+function closeModal(id){ document.getElementById(id).classList.remove('show'); }
+function showSpin(t){ document.getElementById('spin-txt').textContent=t||'Aguarde...'; document.getElementById('spin-bg').classList.add('show'); }
+function hideSpin(){ document.getElementById('spin-bg').classList.remove('show'); }
+
+// ══════════════════════════════════════════════
+// ORC EDITOR
+// ══════════════════════════════════════════════
+function addPeca(nome='',val='',qtd=1,desc=''){
+  pecaCount++;
+  const id=++rowId;
+  const tr=document.createElement('tr'); tr.id='row-'+id;
+  tr.innerHTML=`
+    <td class="n">${pecaCount}</td>
+    <td><input class="L" type="text" value="${nome}" placeholder="Nome da peça…" oninput="calc()"/></td>
+    <td><input type="number" class="inp-qtd" value="${qtd}" min="1" step="1" oninput="calc()"/></td>
+    <td><input type="number" class="inp-val" value="${val}" min="0" step="0.01" placeholder="0,00" oninput="calc()"/></td>
+    <td><input type="number" class="inp-desc red-in" value="${desc}" min="0" step="0.01" placeholder="0,00" oninput="calc()"/></td>
+    <td class="sub" id="sub-${id}">R$ 0,00</td>
+    <td class="no-print"><button class="btn-del-row" onclick="delRow('row-${id}')">✕</button></td>`;
+  document.getElementById('tbody-pecas').appendChild(tr); calc();
+}
+function addMO(nome='',val=''){
+  moCount++;
+  const id=++rowId;
+  const tr=document.createElement('tr'); tr.id='row-'+id;
+  tr.innerHTML=`
+    <td class="n">${moCount}</td>
+    <td><input class="L" type="text" value="${nome}" placeholder="Descrição…" oninput="calc()"/></td>
+    <td><input type="number" class="inp-mo-val" value="${val}" min="0" step="0.01" placeholder="0,00" oninput="calc()"/></td>
+    <td class="sub" id="sub-${id}">R$ 0,00</td>
+    <td class="no-print"><button class="btn-del-row" onclick="delRow('row-${id}')">✕</button></td>`;
+  document.getElementById('tbody-mo').appendChild(tr); calc();
+}
+function delRow(id){ const el=document.getElementById(id); if(el){ el.remove(); renum(); calc(); } }
+function renum(){
+  let p=0; document.querySelectorAll('#tbody-pecas tr').forEach(tr=>{ p++; const td=tr.querySelector('.n'); if(td)td.textContent=p; }); pecaCount=p;
+  let m=0; document.querySelectorAll('#tbody-mo tr').forEach(tr=>{ m++; const td=tr.querySelector('.n'); if(td)td.textContent=m; }); moCount=m;
+}
+function calc(){
+  let bruto=0,descItem=0;
+  document.querySelectorAll('#tbody-pecas tr').forEach(tr=>{
+    const val=parseFloat(tr.querySelector('.inp-val')?.value)||0;
+    const qtd=parseFloat(tr.querySelector('.inp-qtd')?.value)||1;
+    const desc=parseFloat(tr.querySelector('.inp-desc')?.value)||0;
+    const gross=val*qtd; const s=Math.max(0,gross-desc);
+    const el=document.getElementById('sub-'+tr.id.replace('row-',''));
+    if(el)el.textContent=fmt(s);
+    bruto+=gross; descItem+=desc;
+  });
+  const apos=Math.max(0,bruto-descItem);
+  const pct=Math.min(100,Math.max(0,parseFloat(document.getElementById('f-desc-pct').value)||0));
+  const descPct=apos*pct/100; const liq=Math.max(0,apos-descPct);
+  let mo=0;
+  document.querySelectorAll('#tbody-mo tr').forEach(tr=>{
+    const val=parseFloat(tr.querySelector('.inp-mo-val')?.value)||0;
+    const el=document.getElementById('sub-'+tr.id.replace('row-',''));
+    if(el)el.textContent=fmt(val); mo+=val;
+  });
+  document.getElementById('tot-bruto').textContent=fmt(bruto);
+  document.getElementById('tot-desc-item').textContent='- '+fmt(descItem);
+  document.getElementById('tot-desc-pct').textContent='- '+fmt(descPct);
+  document.getElementById('tot-liq').textContent=fmt(liq);
+  document.getElementById('tot-mo').textContent=fmt(mo);
+  document.getElementById('tot-geral').textContent=fmt(liq+mo);
+}
+function getTotal(){ return parseFloat((document.getElementById('tot-geral').textContent||'0').replace('R$ ','').replace(/\./g,'').replace(',','.'))||0; }
+function updateTb(){ document.getElementById('tb-title').textContent=document.getElementById('f-nome').value||'Novo Orçamento'; }
+
+function collectOrc(){
+  const pecasArr=[]; document.querySelectorAll('#tbody-pecas tr').forEach(tr=>{
+    pecasArr.push({nome:tr.querySelector('.L')?.value||'',qtd:tr.querySelector('.inp-qtd')?.value||'1',val:tr.querySelector('.inp-val')?.value||'',desc:tr.querySelector('.inp-desc')?.value||''});
+  });
+  const mosArr=[]; document.querySelectorAll('#tbody-mo tr').forEach(tr=>{
+    mosArr.push({nome:tr.querySelector('.L')?.value||'',val:tr.querySelector('.inp-mo-val')?.value||''});
+  });
+  return{
+    nome:document.getElementById('f-nome').value,tel:document.getElementById('f-tel').value,
+    entrada:document.getElementById('f-entrada').value,garantia:document.getElementById('f-garantia').value,
+    modelo:document.getElementById('f-modelo').value,placa:document.getElementById('f-placa').value,
+    km:document.getElementById('f-km').value,defeito:document.getElementById('f-defeito').value,
+    mecanico:document.getElementById('f-mecanico').value,descPct:document.getElementById('f-desc-pct').value,
+    status:document.getElementById('status-sel').value,pecas:pecasArr,mos:mosArr,total:getTotal(),
+  };
+}
+
+function saveOrc(){
+  const data=collectOrc();
+  if(currentId){ const idx=orcs.findIndex(o=>o.id===currentId); if(idx!==-1)orcs[idx]={...orcs[idx],...data}; }
+  else{ const num=nextNum(); const id=genId(); currentId=id; document.getElementById('orc-num').textContent=num; document.getElementById('btn-del-orc').style.display=''; orcs.unshift({id,num,...data}); }
+  saveOrcs(); renderOrcList(); updateTb(); toast('✅ Orçamento salvo!');
+}
+
+function novoOrc(){
+  currentId=null; rowId=0; pecaCount=0; moCount=0;
+  ['f-nome','f-tel','f-garantia','f-modelo','f-placa','f-km','f-defeito','f-mecanico'].forEach(id=>{ const el=document.getElementById(id); if(el)el.value=''; });
+  document.getElementById('f-desc-pct').value=0;
+  document.getElementById('f-entrada').valueAsDate=new Date();
+  document.getElementById('status-sel').value='aberta';
+  document.getElementById('tbody-pecas').innerHTML='';
+  document.getElementById('tbody-mo').innerHTML='';
+  document.getElementById('orc-num').textContent=nextNum();
+  document.getElementById('tb-title').textContent='Novo Orçamento';
+  document.getElementById('tb-sub').textContent='Preencha e salve';
+  document.getElementById('btn-del-orc').style.display='none';
+  for(let i=0;i<6;i++)addPeca(); addMO('Mão de obra','');
+  calc(); nav('orc'); renderOrcList();
+}
+
+function loadOrc(id){
+  const o=orcs.find(x=>x.id===id); if(!o)return;
+  currentId=id; rowId=0; pecaCount=0; moCount=0;
+  document.getElementById('f-nome').value=o.nome||'';
+  document.getElementById('f-tel').value=o.tel||'';
+  document.getElementById('f-entrada').value=o.entrada||'';
+  document.getElementById('f-garantia').value=o.garantia||'';
+  document.getElementById('f-modelo').value=o.modelo||'';
+  document.getElementById('f-placa').value=o.placa||'';
+  document.getElementById('f-km').value=o.km||'';
+  document.getElementById('f-defeito').value=o.defeito||'';
+  document.getElementById('f-mecanico').value=o.mecanico||'';
+  document.getElementById('f-desc-pct').value=o.descPct||0;
+  document.getElementById('status-sel').value=o.status||'aberta';
+  document.getElementById('orc-num').textContent=o.num||'001';
+  document.getElementById('btn-del-orc').style.display='';
+  document.getElementById('tbody-pecas').innerHTML='';
+  document.getElementById('tbody-mo').innerHTML='';
+  (o.pecas||[]).forEach(p=>addPeca(p.nome,p.val,p.qtd,p.desc));
+  if(!(o.pecas||[]).length)for(let i=0;i<6;i++)addPeca();
+  (o.mos||[]).forEach(m=>addMO(m.nome,m.val));
+  if(!(o.mos||[]).length)addMO('Mão de obra','');
+  calc(); updateTb();
+  document.getElementById('tb-sub').textContent=`OS #${o.num} · ${o.modelo||''} ${o.placa?'· '+o.placa:''}`;
+  nav('orc'); renderOrcList();
+}
+
+function deletarOrc(){
+  if(!currentId)return;
+  if(!confirm('Excluir este orçamento permanentemente?'))return;
+  orcs=orcs.filter(o=>o.id!==currentId); saveOrcs(); novoOrc(); toast('🗑️ Orçamento excluído.');
+}
+
+function renderOrcList(){
+  const q=(document.getElementById('orc-search').value||'').toLowerCase();
+  const list=document.getElementById('orc-list');
+  const filtered=orcs.filter(o=>!q||(o.nome||'').toLowerCase().includes(q)||(o.placa||'').toLowerCase().includes(q)||(o.modelo||'').toLowerCase().includes(q)||(o.num||'').includes(q)).sort((a,b)=>parseInt(b.num)-parseInt(a.num));
+  if(!filtered.length){ list.innerHTML='<div style="padding:16px 10px;font-size:12px;color:var(--t3);text-align:center;">Nenhum resultado</div>'; return; }
+  list.innerHTML=filtered.map(o=>`
+    <div style="padding:8px 10px;border-bottom:1px solid var(--s3);cursor:pointer;background:${o.id===currentId?'rgba(34,197,94,.07)':'transparent'};" onclick="loadOrc('${o.id}')">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:4px;">
+        <span style="font-size:10px;color:var(--g);font-weight:700;">OS #${o.num}</span>
+        ${badgeHtml(o.status)}
+      </div>
+      <div style="font-size:12px;color:var(--t1);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;">${o.nome||'Sem nome'}</div>
+      <div style="font-size:11px;color:var(--t3);">${o.modelo||''} ${o.placa?'· '+o.placa:''} · ${fmt(o.total||0)}</div>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════════════════
+function renderDash(){
+  const total=orcs.reduce((s,o)=>s+(o.total||0),0);
+  const pagosTotal=pags.reduce((s,p)=>s+(parseFloat(p.val)||0),0);
+  const receber=Math.max(0,total-pagosTotal);
+  const abertas=orcs.filter(o=>o.status==='aberta').length;
+
+  // faturamento últimos 6 meses
+  const meses=[];
+  for(let i=5;i>=0;i--){
+    const d=new Date(); d.setMonth(d.getMonth()-i);
+    const key=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    const label=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][d.getMonth()];
+    const val=orcs.filter(o=>(o.entrada||'').startsWith(key)).reduce((s,o)=>s+(o.total||0),0);
+    meses.push({label,val});
+  }
+  const maxVal=Math.max(...meses.map(m=>m.val),1);
+
+  document.getElementById('dash-date').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('dash-content').innerHTML=`
+    <div class="metrics">
+      <div class="metric"><div class="metric-lbl">Total orçamentos</div><div class="metric-val">${orcs.length}</div><div class="metric-sub">${abertas} em aberto</div></div>
+      <div class="metric"><div class="metric-lbl">Faturamento total</div><div class="metric-val green">${fmt(total)}</div><div class="metric-sub">Todos os períodos</div></div>
+      <div class="metric"><div class="metric-lbl">Total recebido</div><div class="metric-val green">${fmt(pagosTotal)}</div><div class="metric-sub">${pags.length} pagamento(s)</div></div>
+      <div class="metric"><div class="metric-lbl">A receber</div><div class="metric-val ${receber>0?'yellow':'green'}">${fmt(receber)}</div><div class="metric-sub">Pendente de pagamento</div></div>
+    </div>
+    <div class="chart-wrap">
+      <div class="chart-title">Faturamento — Últimos 6 meses</div>
+      <div class="bar-chart">
+        ${meses.map(m=>`
+          <div class="bar-col">
+            <div class="bar-val">${m.val>0?fmt(m.val):''}</div>
+            <div class="bar" style="height:${Math.max(4,(m.val/maxVal)*100)}%;"></div>
+            <div class="bar-lbl">${m.label}</div>
+          </div>`).join('')}
+      </div>
+    </div>
+    <div class="tbl-wrap">
+      <div class="tbl-head"><span class="tbl-title">Orçamentos recentes</span></div>
+      <table class="dt">
+        <thead><tr><th>OS</th><th>Cliente</th><th>Veículo</th><th>Data</th><th>Status</th><th>Total</th></tr></thead>
+        <tbody>
+          ${orcs.slice().sort((a,b)=>parseInt(b.num)-parseInt(a.num)).slice(0,8).map(o=>`
+            <tr class="clickable" onclick="loadOrc('${o.id}');nav('orc');">
+              <td>#${o.num}</td><td>${o.nome||'—'}</td>
+              <td class="muted">${o.modelo||''} ${o.placa||''}</td>
+              <td class="muted">${fmtD(o.entrada)}</td>
+              <td>${badgeHtml(o.status)}</td>
+              <td class="green">${fmt(o.total||0)}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+// ══════════════════════════════════════════════
+// FINANCEIRO
+// ══════════════════════════════════════════════
+function openModalPag(){
+  document.getElementById('pag-data').valueAsDate=new Date();
+  document.getElementById('pag-val').value='';
+  document.getElementById('pag-obs').value='';
+  document.getElementById('pag-forma').value='pix';
+  const sel=document.getElementById('pag-orc-sel');
+  sel.innerHTML='<option value="">Selecione o orçamento…</option>'+orcs.filter(o=>o.status!=='pago').sort((a,b)=>parseInt(b.num)-parseInt(a.num)).map(o=>`<option value="${o.id}">OS #${o.num} — ${o.nome||'Sem nome'} — ${fmt(o.total||0)}</option>`).join('');
+  openModal('modal-pag');
+}
+
+function salvarPag(){
+  const orcId=document.getElementById('pag-orc-sel').value;
+  const val=parseFloat(document.getElementById('pag-val').value)||0;
+  if(!orcId){alert('Selecione o orçamento.');return;}
+  if(!val){alert('Informe o valor recebido.');return;}
+  const pag={id:genId(),orcId,val,data:document.getElementById('pag-data').value,forma:document.getElementById('pag-forma').value,obs:document.getElementById('pag-obs').value};
+  pags.push(pag); savePags();
+  const orc=orcs.find(o=>o.id===orcId);
+  if(orc){ orc.status='pago'; saveOrcs(); }
+  closeModal('modal-pag'); renderFin(); toast('✅ Pagamento registrado!');
+}
+
+function renderFin(){
+  const totalFat=orcs.reduce((s,o)=>s+(o.total||0),0);
+  const totalRec=pags.reduce((s,p)=>s+(parseFloat(p.val)||0),0);
+  const aReceber=Math.max(0,totalFat-totalRec);
+  const orcsPendentes=orcs.filter(o=>o.status!=='pago'&&(o.total||0)>0);
+
+  document.getElementById('fin-content').innerHTML=`
+    <div class="metrics">
+      <div class="metric"><div class="metric-lbl">Faturamento total</div><div class="metric-val green">${fmt(totalFat)}</div></div>
+      <div class="metric"><div class="metric-lbl">Total recebido</div><div class="metric-val green">${fmt(totalRec)}</div></div>
+      <div class="metric"><div class="metric-lbl">A receber</div><div class="metric-val yellow">${fmt(aReceber)}</div><div class="metric-sub">${orcsPendentes.length} orçamento(s)</div></div>
+      <div class="metric"><div class="metric-lbl">Pagamentos</div><div class="metric-val">${pags.length}</div></div>
+    </div>
+    <div class="tbl-wrap" style="margin-bottom:16px;">
+      <div class="tbl-head"><span class="tbl-title">⚠️ Contas a receber</span></div>
+      <table class="dt">
+        <thead><tr><th>OS</th><th>Cliente</th><th>Veículo</th><th>Data entrada</th><th>Status</th><th>Valor</th><th></th></tr></thead>
+        <tbody>
+          ${!orcsPendentes.length?'<tr><td colspan="7" style="text-align:center;color:var(--t3);padding:20px;">Nenhuma conta pendente 🎉</td></tr>':
+          orcsPendentes.sort((a,b)=>parseInt(a.num)-parseInt(b.num)).map(o=>`
+            <tr>
+              <td>#${o.num}</td><td>${o.nome||'—'}</td>
+              <td class="muted">${o.modelo||''} ${o.placa||''}</td>
+              <td class="muted">${fmtD(o.entrada)}</td>
+              <td>${badgeHtml(o.status)}</td>
+              <td class="yellow">${fmt(o.total||0)}</td>
+              <td><button class="btn btn-green" style="font-size:11px;padding:4px 8px;" onclick="quickPag('${o.id}')">Receber</button></td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+    <div class="tbl-wrap">
+      <div class="tbl-head"><span class="tbl-title">Histórico de pagamentos</span></div>
+      <table class="dt">
+        <thead><tr><th>Data</th><th>OS</th><th>Cliente</th><th>Forma</th><th>Observação</th><th>Valor</th></tr></thead>
+        <tbody>
+          ${!pags.length?'<tr><td colspan="6" style="text-align:center;color:var(--t3);padding:20px;">Nenhum pagamento ainda</td></tr>':
+          pags.slice().sort((a,b)=>b.data>a.data?1:-1).map(p=>{
+            const o=orcs.find(x=>x.id===p.orcId)||{};
+            return`<tr>
+              <td>${fmtD(p.data)}</td>
+              <td>#${o.num||'?'}</td>
+              <td>${o.nome||'—'}</td>
+              <td><span class="badge badge-blue">${pagForma(p.forma)}</span></td>
+              <td class="muted">${p.obs||'—'}</td>
+              <td class="green">${fmt(p.val)}</td>
+            </tr>`;}).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function quickPag(orcId){
+  const o=orcs.find(x=>x.id===orcId); if(!o)return;
+  document.getElementById('pag-data').valueAsDate=new Date();
+  document.getElementById('pag-val').value=o.total||'';
+  document.getElementById('pag-obs').value='';
+  document.getElementById('pag-forma').value='pix';
+  const sel=document.getElementById('pag-orc-sel');
+  sel.innerHTML=`<option value="${orcId}">OS #${o.num} — ${o.nome||''} — ${fmt(o.total||0)}</option>`;
+  openModal('modal-pag');
+}
+
+// ══════════════════════════════════════════════
+// ESTOQUE
+// ══════════════════════════════════════════════
+function openModalPeca(id){
+  editingPecaId=id||null;
+  document.getElementById('modal-peca-title').textContent=id?'Editar Peça':'Nova Peça';
+  if(id){
+    const p=pecas.find(x=>x.id===id)||{};
+    document.getElementById('peca-nome').value=p.nome||'';
+    document.getElementById('peca-qty').value=p.qty||0;
+    document.getElementById('peca-min').value=p.min||2;
+    document.getElementById('peca-custo').value=p.custo||'';
+    document.getElementById('peca-venda').value=p.venda||'';
+    document.getElementById('peca-forn').value=p.forn||'';
+  } else {
+    ['peca-nome','peca-qty','peca-min','peca-custo','peca-venda','peca-forn'].forEach(id=>{ const el=document.getElementById(id); if(el)el.value=''; });
+    document.getElementById('peca-min').value=2;
+    document.getElementById('peca-qty').value=0;
+  }
+  openModal('modal-peca');
+}
+
+function salvarPeca(){
+  const nome=document.getElementById('peca-nome').value.trim();
+  if(!nome){alert('Informe o nome da peça.');return;}
+  const data={nome,qty:parseInt(document.getElementById('peca-qty').value)||0,min:parseInt(document.getElementById('peca-min').value)||2,custo:parseFloat(document.getElementById('peca-custo').value)||0,venda:parseFloat(document.getElementById('peca-venda').value)||0,forn:document.getElementById('peca-forn').value};
+  if(editingPecaId){ const idx=pecas.findIndex(p=>p.id===editingPecaId); if(idx!==-1)pecas[idx]={...pecas[idx],...data}; }
+  else { pecas.push({id:genId(),...data}); }
+  savePecas(); closeModal('modal-peca'); renderEstoque(); toast('✅ Peça salva!');
+}
+
+function openEntrada(id){
+  entradaPecaId=id;
+  const p=pecas.find(x=>x.id===id)||{};
+  document.getElementById('entrada-peca-nome').value=p.nome||'';
+  document.getElementById('entrada-qty').value='';
+  openModal('modal-entrada');
+}
+
+function salvarEntrada(){
+  const qty=parseInt(document.getElementById('entrada-qty').value)||0;
+  if(!qty||qty<1){alert('Informe uma quantidade válida.');return;}
+  const idx=pecas.findIndex(p=>p.id===entradaPecaId);
+  if(idx!==-1){ pecas[idx].qty=(pecas[idx].qty||0)+qty; savePecas(); }
+  closeModal('modal-entrada'); renderEstoque(); toast(`✅ +${qty} unidade(s) adicionada(s)!`);
+}
+
+function deletarPeca(id){
+  if(!confirm('Excluir esta peça do estoque?'))return;
+  pecas=pecas.filter(p=>p.id!==id); savePecas(); renderEstoque(); toast('🗑️ Peça removida.');
+}
+
+function renderEstoque(){
+  const low=pecas.filter(p=>p.qty<=p.min);
+  document.getElementById('estoque-content').innerHTML=`
+    <div class="metrics">
+      <div class="metric"><div class="metric-lbl">Total de peças</div><div class="metric-val">${pecas.length}</div></div>
+      <div class="metric"><div class="metric-lbl">Estoque baixo</div><div class="metric-val red">${low.length}</div><div class="metric-sub">Abaixo do mínimo</div></div>
+      <div class="metric"><div class="metric-lbl">Valor total estoque</div><div class="metric-val green">${fmt(pecas.reduce((s,p)=>s+(p.custo||0)*(p.qty||0),0))}</div><div class="metric-sub">Preço de custo</div></div>
+      <div class="metric"><div class="metric-lbl">Valor venda</div><div class="metric-val green">${fmt(pecas.reduce((s,p)=>s+(p.venda||0)*(p.qty||0),0))}</div></div>
+    </div>
+    ${low.length?`<div style="background:rgba(239,68,68,.1);border:1px solid var(--red);border-radius:8px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:var(--red);">
+      ⚠️ Peças com estoque baixo: ${low.map(p=>`<strong>${p.nome}</strong> (${p.qty} un)`).join(', ')}
+    </div>`:''}
+    <div class="estoque-grid">
+      ${!pecas.length?'<div style="color:var(--t3);font-size:13px;">Nenhuma peça cadastrada. Clique em "+ Nova Peça" para começar.</div>':
+      pecas.map(p=>`
+        <div class="peca-card ${p.qty<=p.min?'low':''}">
+          <div class="peca-name">${p.nome}</div>
+          <div class="peca-info">${p.forn?'Fornecedor: '+p.forn:'Sem fornecedor'}</div>
+          <div class="peca-stock">
+            <div>
+              <div class="peca-qty ${p.qty<=p.min?'low':'ok'}">${p.qty} un</div>
+              <div class="peca-min">Mín: ${p.min} un</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:12px;color:var(--t3);">Custo: ${fmt(p.custo)}</div>
+              <div style="font-size:12px;color:var(--g);font-weight:700;">Venda: ${fmt(p.venda)}</div>
+            </div>
+          </div>
+          <div class="peca-actions">
+            <button class="peca-btn peca-btn-add" onclick="openEntrada('${p.id}')">+ Entrada</button>
+            <button class="peca-btn peca-btn-edit" onclick="openModalPeca('${p.id}')">Editar</button>
+            <button class="peca-btn" style="background:rgba(239,68,68,.1);color:var(--red);flex:0;padding:5px 8px;" onclick="deletarPeca('${p.id}')">🗑️</button>
+          </div>
+        </div>`).join('')}
+    </div>`;
+}
+
+// ══════════════════════════════════════════════
+// RELATÓRIOS
+// ══════════════════════════════════════════════
+function renderRelat(){
+  // por status
+  const statusCount={aberta:0,aprovado:0,execucao:0,concluido:0,pago:0};
+  orcs.forEach(o=>{ if(statusCount[o.status]!==undefined)statusCount[o.status]++; });
+
+  // por mês (12 meses)
+  const mesesRelat=[];
+  for(let i=11;i>=0;i--){
+    const d=new Date(); d.setMonth(d.getMonth()-i);
+    const key=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    const label=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][d.getMonth()]+'/'+String(d.getFullYear()).slice(2);
+    const orcsMes=orcs.filter(o=>(o.entrada||'').startsWith(key));
+    const fat=orcsMes.reduce((s,o)=>s+(o.total||0),0);
+    const rec=pags.filter(p=>p.data.startsWith(key)).reduce((s,p)=>s+(parseFloat(p.val)||0),0);
+    mesesRelat.push({label,fat,rec,qtd:orcsMes.length});
+  }
+
+  // top clientes
+  const cliMap={};
+  orcs.forEach(o=>{ const k=(o.nome||'Sem nome').trim(); if(!cliMap[k])cliMap[k]={nome:k,total:0,qtd:0}; cliMap[k].total+=o.total||0; cliMap[k].qtd++; });
+  const topCli=Object.values(cliMap).sort((a,b)=>b.total-a.total).slice(0,5);
+
+  document.getElementById('relat-content').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+      <div class="tbl-wrap">
+        <div class="tbl-head"><span class="tbl-title">Orçamentos por status</span></div>
+        <table class="dt">
+          <thead><tr><th>Status</th><th>Quantidade</th></tr></thead>
+          <tbody>
+            ${Object.entries(statusCount).map(([k,v])=>`<tr><td>${badgeHtml(k)}</td><td>${v}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="tbl-wrap">
+        <div class="tbl-head"><span class="tbl-title">Top 5 clientes</span></div>
+        <table class="dt">
+          <thead><tr><th>Cliente</th><th>OS</th><th>Total</th></tr></thead>
+          <tbody>
+            ${!topCli.length?'<tr><td colspan="3" style="color:var(--t3);text-align:center;">Sem dados</td></tr>':topCli.map(c=>`<tr><td>${c.nome}</td><td class="muted">${c.qtd}</td><td class="green">${fmt(c.total)}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="tbl-wrap">
+      <div class="tbl-head"><span class="tbl-title">Relatório mensal — Últimos 12 meses</span></div>
+      <table class="dt">
+        <thead><tr><th>Mês</th><th>Orçamentos</th><th>Faturado</th><th>Recebido</th><th>Pendente</th></tr></thead>
+        <tbody>
+          ${mesesRelat.map(m=>`<tr>
+            <td style="font-weight:600;">${m.label}</td>
+            <td class="muted">${m.qtd}</td>
+            <td class="green">${m.fat>0?fmt(m.fat):'—'}</td>
+            <td style="color:#4ade80;">${m.rec>0?fmt(m.rec):'—'}</td>
+            <td class="${m.fat-m.rec>0?'yellow':'muted'}">${m.fat-m.rec>0?fmt(m.fat-m.rec):'—'}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+// ══════════════════════════════════════════════
+// CONFIGURAÇÕES
+// ══════════════════════════════════════════════
+function loadConfigForm(){
+  document.getElementById('cfg-nome').value=cfg.nome||'INJECT DIESEL';
+  document.getElementById('cfg-cnpj').value=cfg.cnpj||'14.115.613/0001-89';
+  document.getElementById('cfg-end').value=cfg.end||'BR N1015';
+  document.getElementById('cfg-tel1').value=cfg.tel1||'(98) 98501-9532';
+  document.getElementById('cfg-tel2').value=cfg.tel2||'(98) 99155-0075';
+  document.getElementById('cfg-esp').value=cfg.esp||'Bombas Injetoras e Injeção Eletrônica';
+  if(cfg.logo){ const area=document.getElementById('logo-upload-area'); area.innerHTML=`<img src="${cfg.logo}" />`; }
+}
+
+function saveConfig(){
+  cfg.nome=document.getElementById('cfg-nome').value||'INJECT DIESEL';
+  cfg.cnpj=document.getElementById('cfg-cnpj').value;
+  cfg.end=document.getElementById('cfg-end').value;
+  cfg.tel1=document.getElementById('cfg-tel1').value;
+  cfg.tel2=document.getElementById('cfg-tel2').value;
+  cfg.esp=document.getElementById('cfg-esp').value;
+  saveCfg(); applyConfig(); toast('✅ Configurações salvas!');
+}
+
+function applyConfig(){
+  if(cfg.nome){ document.getElementById('sb-brand-name').textContent=cfg.nome; document.getElementById('sb-ring-letter').textContent=cfg.nome[0]||'I'; }
+  if(cfg.cnpj) document.getElementById('doc-cnpj').textContent=cfg.cnpj;
+  if(cfg.end)  document.getElementById('doc-end').textContent=cfg.end;
+  if(cfg.tel1) document.getElementById('doc-tel').textContent=cfg.tel1;
+  if(cfg.tel2) document.getElementById('doc-tel2').textContent=cfg.tel2;
+  if(cfg.esp)  document.getElementById('doc-esp').textContent=cfg.esp;
+  if(cfg.nome){
+    document.getElementById('doc-razao').textContent=cfg.nome;
+    const parts=cfg.nome.split(' ');
+    document.getElementById('doc-logo-name').textContent=parts[0]||'INJECT';
+    document.getElementById('doc-logo-sub').textContent=parts.slice(1).join(' ')||'DIESEL';
+    document.getElementById('doc-logo-letter').textContent=(cfg.nome[0]||'I').toUpperCase();
+    document.getElementById('doc-logo-slogan').textContent=cfg.esp||'';
+  }
+  if(cfg.logo){
+    const area=document.getElementById('doc-logo-area');
+    area.innerHTML=`<img src="${cfg.logo}" style="max-height:90px;max-width:140px;object-fit:contain;"/>`;
+  }
+}
+
+function handleLogo(input){
+  const file=input.files[0]; if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    cfg.logo=e.target.result; saveCfg();
+    document.getElementById('logo-upload-area').innerHTML=`<img src="${cfg.logo}" style="max-height:80px;max-width:200px;object-fit:contain;"/>`;
+    applyConfig(); toast('✅ Logo atualizada!');
+  };
+  reader.readAsDataURL(file);
+}
+
+// ══════════════════════════════════════════════
+// WHATSAPP / GMAIL
+// ══════════════════════════════════════════════
+async function enviarWa(){
+  if(typeof html2canvas==='undefined'){ alert('html2canvas não carregou.'); return; }
+  saveOrc();
+  showSpin('Gerando imagem do orçamento...');
+  try{
+    document.querySelectorAll('.no-print').forEach(el=>el.style.visibility='hidden');
+    const canvas=await html2canvas(document.getElementById('doc'),{scale:2,useCORS:true,backgroundColor:'#ffffff',logging:false});
+    document.querySelectorAll('.no-print').forEach(el=>el.style.visibility='');
+    hideSpin();
+    canvas.toBlob(async blob=>{
+      const num=document.getElementById('orc-num').textContent;
+      const file=new File([blob],`OS_${num}_InjectDiesel.png`,{type:'image/png'});
+      if(navigator.canShare&&navigator.canShare({files:[file]})){
+        try{ await navigator.share({title:'Orçamento Inject Diesel',files:[file]}); }
+        catch(e){ if(e.name!=='AbortError')baixarImg(canvas); }
+      } else {
+        baixarImg(canvas);
+        const cli=document.getElementById('f-nome').value||'Cliente';
+        const tot=document.getElementById('tot-geral').textContent;
+        const msg=`Olá ${cli}! 😊\n\nSegue o orçamento *Nº ${num}* da *Inject Diesel*.\n💰 *Total: ${tot}*\n\n_Imagem do orçamento em anexo_ 👆`;
+        setTimeout(()=>window.open('https://web.whatsapp.com/send?text='+encodeURIComponent(msg),'_blank'),600);
+      }
+    },'image/png');
+  }catch(e){
+    document.querySelectorAll('.no-print').forEach(el=>el.style.visibility='');
+    hideSpin(); alert('Erro: '+e.message);
+  }
+}
+function baixarImg(canvas){ const a=document.createElement('a'); a.download=`OS_${document.getElementById('orc-num').textContent}_InjectDiesel.png`; a.href=canvas.toDataURL('image/png'); a.click(); }
+
+function enviarMail(){
+  saveOrc();
+  const cli=document.getElementById('f-nome').value||'Cliente';
+  const modelo=document.getElementById('f-modelo').value||'';
+  const placa=document.getElementById('f-placa').value||'';
+  const tot=document.getElementById('tot-geral').textContent;
+  const num=document.getElementById('orc-num').textContent;
+  const sub=`Orçamento Nº ${num} — ${cfg.nome||'Inject Diesel'}`;
+  const body=`Olá ${cli},\n\nSegue o orçamento Nº ${num}.\n\nVeículo: ${modelo} ${placa}\nTotal: ${tot}\n\nQualquer dúvida:\n${cfg.tel1||'(98) 98501-9532'} | ${cfg.tel2||'(98) 99155-0075'}\n\n${cfg.nome||'Inject Diesel'}`;
+  window.open(`mailto:?subject=${encodeURIComponent(sub)}&body=${encodeURIComponent(body)}`,'_blank');
+}
+
+// ══════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════
+loadAll();
+applyConfig();
+renderOrcList();
+novoOrc();
+document.getElementById('dash-date').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+</script>
+<script>
+if("serviceWorker" in navigator){
+  window.addEventListener("load",()=>{
+    navigator.serviceWorker.register("sw.js")
+      .then(r=>console.log("SW ok:",r.scope))
+      .catch(e=>console.log("SW err:",e));
+  });
+}
+let deferredPrompt;
+window.addEventListener("beforeinstallprompt",(e)=>{
+  e.preventDefault(); deferredPrompt=e;
+  const btn=document.getElementById("btn-install");
+  if(btn)btn.style.display="flex";
+});
+window.addEventListener("appinstalled",()=>{
+  deferredPrompt=null;
+  const btn=document.getElementById("btn-install");
+  if(btn)btn.style.display="none";
+});
+function installApp(){
+  if(deferredPrompt){
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(()=>{ deferredPrompt=null; });
+  } else {
+    alert("Para instalar:\n\nAndroid: Menu do Chrome → Adicionar à tela inicial\n\niPhone: Safari → Compartilhar → Adicionar à tela de início\n\nPC: Ícone de instalar na barra de endereço do Chrome");
+  }
+}
+</script>
+</body>
+</html>

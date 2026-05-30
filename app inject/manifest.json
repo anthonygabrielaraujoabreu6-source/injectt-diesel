@@ -1,0 +1,26 @@
+{
+  "name": "Inject Diesel PRO",
+  "short_name": "Inject Diesel",
+  "description": "Sistema de Orçamentos — Inject Diesel",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0d0d0d",
+  "theme_color": "#111111",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='32' fill='%23111'/><circle cx='96' cy='96' r='60' fill='none' stroke='%2322c55e' stroke-width='10'/><text x='96' y='120' text-anchor='middle' font-size='80' font-weight='900' fill='%2322c55e' font-family='Arial'>I</text></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='80' fill='%23111'/><circle cx='256' cy='256' r='160' fill='none' stroke='%2322c55e' stroke-width='24'/><text x='256' y='320' text-anchor='middle' font-size='220' font-weight='900' fill='%2322c55e' font-family='Arial'>I</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "productivity"],
+  "lang": "pt-BR"
+}
